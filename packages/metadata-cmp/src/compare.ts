@@ -3,6 +3,7 @@
 
 import type { RuntimeVersion, StorageEntryMetadataLatest } from '@polkadot/types/interfaces';
 import type { Registry } from '@polkadot/types/types';
+import { types as acalaTypes } from '@acala-network/types';
 
 import yargs from 'yargs';
 
@@ -71,7 +72,7 @@ async function getMetadata (url: string): Promise<[Registry, Metadata, RuntimeVe
   assert(url.startsWith('ws://') || url.startsWith('wss://'), `Invalid WebSocket endpoint ${url}, expected ws:// or wss://`);
 
   const provider = new WsProvider(url);
-  const api = await ApiPromise.create({ provider });
+  const api = await ApiPromise.create({ provider, types: acalaTypes });
 
   provider.on('error', () => process.exit());
 

@@ -15,6 +15,7 @@
   "bugs": "https://github.com/polkadot-js/tools/issues",
   "homepage": "https://github.com/polkadot-js/tools/tree/master/packages/metadata-cmp#readme",
   "dependencies": {
+    "@acala-network/types": "^2.3.1",
     "@babel/core": "^7.15.5",
     "@babel/register": "^7.15.3",
     "@babel/runtime": "^7.15.4",
