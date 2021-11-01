@@ -1,33 +1,38 @@
 {
-  "name": "@polkadot/signer-cli",
-  "version": "0.46.3-0",
+  "author": "Jaco Greeff <jacogr@gmail.com>",
+  "bugs": "https://github.com/polkadot-js/tools/issues",
+  "contributors": [],
   "description": "A commandline signer for offline signature generataion",
-  "main": "index.cjs",
+  "engines": {},
+  "homepage": "https://github.com/polkadot-js/tools/tree/master/packages/signer-cli#readme",
+  "license": "Apache-2.0",
+  "maintainers": [],
+  "name": "@polkadot/signer-cli",
+  "repository": {
+    "directory": "packages/signer-cli",
+    "type": "git",
+    "url": "https://github.com/polkadot-js/tools.git"
+  },
   "sideEffects": false,
+  "version": "0.48.2-2",
+  "main": "index.cjs",
   "bin": {
     "polkadot-js-signer": "./index.cjs"
   },
-  "author": "Jaco Greeff <jacogr@gmail.com>",
-  "maintainers": [],
-  "contributors": [],
-  "license": "Apache-2.0",
-  "repository": "github:polkadot-js/tools",
-  "bugs": "https://github.com/polkadot-js/tools/issues",
-  "homepage": "https://github.com/polkadot-js/tools/tree/master/packages/signer-cli#readme",
   "dependencies": {
-    "@babel/core": "^7.15.5",
+    "@babel/core": "^7.15.8",
     "@babel/register": "^7.15.3",
     "@babel/runtime": "^7.15.4",
-    "@polkadot/api": "^6.0.5",
-    "@polkadot/api-cli": "^0.46.3-0",
-    "@polkadot/keyring": "^7.4.1",
-    "@polkadot/types": "^6.0.5",
-    "@polkadot/util": "^7.4.1",
-    "@polkadot/util-crypto": "^7.4.1",
-    "yargs": "^17.1.1"
+    "@polkadot/api": "^6.5.1",
+    "@polkadot/api-cli": "^0.48.2-2",
+    "@polkadot/keyring": "^7.6.1",
+    "@polkadot/types": "^6.5.1",
+    "@polkadot/util": "^7.6.1",
+    "@polkadot/util-crypto": "^7.6.1",
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
-    "@types/node": "^16.9.4",
-    "@types/yargs": "^17.0.2"
+    "@types/node": "^16.11.6",
+    "@types/yargs": "^17.0.4"
   }
 }

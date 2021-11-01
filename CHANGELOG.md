@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## 0.48.1 Oct 25, 2021
+
+Contributed:
+
+- Add specName/Version diffs to metadata compares (Thanks to https://github.com/apopiak)
+
+Changes:
+
+- Updated to `@polkadot/api` 6.5.1
+
+
+## 0.47.4 Oct 19, 2021
+
+Changes:
+
+- Updated to `@polkadot/api` 6.4.2
+
+
+## 0.47.3 Oct 18, 2021
+
+Changes:
+
+- Updated to `@polkadot/api` 6.4.1
+
+
+## 0.47.2 Oct 10, 2021
+
+Changes:
+
+- Updated to `@polkadot/api` 6.3.1
+
+
+## 0.47.1 Oct 4, 2021
+
+Upgrade priority: Low.
+
+Contributed:
+
+- Add support for `tip` and `assetId` payment options (Thanks to https://github.com/apopiak)
+- Add example for complex params to README (Thanks to https://github.com/PierreBesson)
+
+Changes:
+
+- Updated to `@polkadot/api` 6.2.1
+
+
 ## 0.46.2 Sep 20, 2021
 
 Upgrade priority: Low.
