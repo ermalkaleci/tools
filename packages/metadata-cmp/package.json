@@ -20,7 +20,7 @@
     "polkadot-js-metadata-cmp": "./index.cjs"
   },
   "dependencies": {
-    "@acala-network/types": "^2.3.1",
+    "@acala-network/types": "^3.0.2",
     "@babel/core": "^7.15.8",
     "@babel/register": "^7.15.3",
     "@babel/runtime": "^7.15.4",
