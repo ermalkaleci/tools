@@ -5,17 +5,13 @@ import type { SignerOptions } from '@polkadot/api/submittable/types';
 import type { Index } from '@polkadot/types/interfaces';
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { assert } from '@polkadot/util';
 
 import RawSigner from './RawSigner';
+import { getTx, mortalityOpts } from './util';
 
-export default async function cmdSendOffline (account: string, blocks: number | undefined, endpoint: string, nonce: number | undefined | Index, [tx, ...params]: string[]): Promise<void> {
+export default async function cmdSendOffline (account: string, blocks: number | undefined, endpoint = '', nonce: number | undefined | Index, [tx, ...params]: string[]): Promise<void> {
   const provider = new WsProvider(endpoint);
   const api = await ApiPromise.create({ provider });
-  const [section, method] = tx.split('.');
-
-  assert(api.tx[section] && api.tx[section][method], `Unable to find method ${section}.${method}`);
-
   const options: Partial<SignerOptions> = { signer: new RawSigner() };
 
   if (!blocks && blocks !== 0) {
@@ -32,17 +28,10 @@ export default async function cmdSendOffline (account: string, blocks: number | 
     options.blockHash = api.genesisHash;
     options.era = 0;
   } else {
-    // Get current block if we want to modify the number of blocks we have to sign
-    const signedBlock = await api.rpc.chain.getBlock();
-
-    options.blockHash = signedBlock.block.header.hash;
-    options.era = api.createType('ExtrinsicEra', {
-      current: signedBlock.block.header.number,
-      period: blocks
-    });
+    await mortalityOpts(api, options, blocks);
   }
 
-  const transaction = api.tx[section][method](...params);
+  const transaction = getTx(api, tx)(...params);
 
   await transaction.signAsync(account, options);
 

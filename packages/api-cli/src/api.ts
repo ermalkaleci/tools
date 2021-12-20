@@ -158,47 +158,33 @@ Example: --seed "//Alice" tx.balances.transfer F7Gh 10000`
       type: 'string'
     }
   })
-  .argv;
+  .argv as Params;
 
-const { _: [endpoint, ...paramsInline], assetId, info, noWait, params: paramsFile, rpc, seed, sign, sub, sudo, sudoUncheckedWeight, tip, types, ws } = argv as unknown as Params;
+const { _: [endpoint, ...paramsInline], assetId, info, noWait, params: paramsFile, seed, sign, sub, sudo, sudoUncheckedWeight, tip, ws } = argv;
 const params = parseParams(paramsInline, paramsFile);
 
-function readTypes (): ApiOptionsTypes {
-  if (!types) {
-    return {};
+function readFile <T> (src: string): T {
+  if (!src) {
+    return {} as T;
   }
 
-  assert(fs.existsSync(types), `Unable to read .json file at ${types}`);
+  assert(fs.existsSync(src), `Unable to read .json file at ${src}`);
 
-  return JSON.parse(fs.readFileSync(types, 'utf8')) as ApiOptionsTypes;
-}
-
-function readRpc (): ApiOptionsRpc {
-  if (!rpc) {
-    return {};
-  }
-
-  assert(fs.existsSync(rpc), `Unable to read .json file at ${rpc}`);
-
-  return JSON.parse(fs.readFileSync(rpc, 'utf8')) as ApiOptionsRpc;
+  return JSON.parse(fs.readFileSync(src, 'utf8')) as T;
 }
 
 // parse the arguments and retrieve the details of what we want to do
 async function getCallInfo (): Promise<CallInfo> {
   assert(endpoint && endpoint.includes('.'), 'You need to specify the command to execute, e.g. query.system.account');
 
-  const rpc: ApiOptionsRpc = readRpc();
-  const types: ApiOptionsTypes = readTypes();
-
+  const rpc: ApiOptionsRpc = readFile(argv.rpc);
+  const types: ApiOptionsTypes = readFile(argv.types);
   const provider = new WsProvider(ws);
   const api = await ApiPromise.create({ provider, rpc, types });
   const apiExt = (api as unknown) as ApiExt;
   const [type, section, method] = endpoint.split('.') as [keyof ApiExt, string, string];
 
-  assert(
-    ['consts', 'derive', 'query', 'rpc', 'tx'].includes(type),
-    `Expected one of consts, derive, query, rpc, tx, found ${type}`
-  );
+  assert(['consts', 'derive', 'query', 'rpc', 'tx'].includes(type), `Expected one of consts, derive, query, rpc, tx, found ${type}`);
   assert(apiExt[type][section], `Cannot find ${type}.${section}`);
   assert(apiExt[type][section][method], `Cannot find ${type}.${section}.${method}`);
 
@@ -225,7 +211,6 @@ async function getCallInfo (): Promise<CallInfo> {
 // retrieve consts
 function logConst ({ fn, log }: CallInfo): void {
   log(fn);
-
   process.exit(0);
 }
 
@@ -243,44 +228,35 @@ function logDetails ({ fn: { description, meta }, method, section }: CallInfo): 
 
   // Empty line at the end to make it pretty
   console.log();
-
   process.exit(0);
 }
 
 function isCrypto (type: string): type is KeypairType {
-  if (CRYPTO.includes(type)) {
-    return true;
-  }
-
-  return false;
+  return CRYPTO.includes(type);
 }
 
 // send a transaction
 async function makeTx ({ api, fn, log }: CallInfo): Promise<(() => void) | Hash> {
   assert(seed, 'You need to specify an account seed with tx.*');
-  assert(CRYPTO.includes(sign), `The crypto type can only be one of ${CRYPTO.join(', ')} found '${sign}'`);
+  assert(isCrypto(sign), `The crypto type can only be one of ${CRYPTO.join(', ')} found '${sign}'`);
 
   const keyring = new Keyring();
-  const auth = keyring.createFromUri(seed, {}, isCrypto(sign) ? sign : undefined);
+  const signer = keyring.createFromUri(seed, {}, sign);
   let signable;
 
   if (sudo || sudoUncheckedWeight) {
     const adminId = await api.query.sudo.key();
 
-    assert(adminId.eq(auth.address), 'Supplied seed does not match on-chain sudo key');
+    assert(adminId.eq(signer.address), 'Supplied seed does not match on-chain sudo key');
 
-    if (sudoUncheckedWeight) {
-      signable = api.tx.sudo.sudoUncheckedWeight(fn(...params), sudoUncheckedWeight);
-    } else {
-      signable = api.tx.sudo.sudo(fn(...params));
-    }
+    signable = sudoUncheckedWeight
+      ? api.tx.sudo.sudoUncheckedWeight(fn(...params), sudoUncheckedWeight)
+      : api.tx.sudo.sudo(fn(...params));
   } else {
     signable = fn(...params);
   }
 
-  const options = { assetId, tip };
-
-  return signable.signAndSend(auth, options, (result: SubmittableResult): void => {
+  return signable.signAndSend(signer, { assetId, tip }, (result: SubmittableResult): void => {
     log(result);
 
     if (noWait || result.isInBlock || result.isFinalized) {
